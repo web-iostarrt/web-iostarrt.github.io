@@ -1,0 +1,36 @@
+name: Deploy Codeberg to GitHub Pages
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download website from Codeberg
+        run: |
+          git clone https://codeberg.org/devlal/web-iostarrt.git codeberg-site
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Codeberg website
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./codeberg-site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4  
